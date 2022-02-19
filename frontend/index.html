@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<head>
+    <title>Miejsce spotkań</title>
+</head>
+<style>
+    html, body {
+        width: 100%;
+        height: 100%;
+        background-color: #ffe4c4;
+    }
+
+    #mainContainer {
+        margin: auto;
+        width: 70vw;
+        background-color: azure;
+        float: left;
+    }
+
+    #bufor {
+        max-height: 100vh;
+        overflow-y: scroll;
+        float: left;
+    }
+
+    .menu {
+        height: 100%;
+        width: 28vw;
+        background-color: #ffecd5;
+        overflow: hidden;
+        float: right;
+        overflow-y: scroll
+    }
+
+    .logo {
+        display: block;
+        width: 100%;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .container {
+        display: block;
+        width: 25vw;
+        background-color: #c4b8b8;
+        height: 70vh;
+        float: left;
+        overflow-wrap: break-word;
+    }
+
+    .rating {
+        display: block;
+        width: 25vw;
+        background-color: #d9e2d9;
+        height: 10vh;
+        float: left;
+        overflow-wrap: break-word;
+    }
+
+    .rightContainer {
+        display: block;
+        width: 25vw;
+        background-color: #d0bebe;
+        height: 20vh;
+        float: left;
+        overflow-wrap: break-word;
+    }
+
+    .imageSizeCSS {
+        max-height: 100%;
+        width: 100%;
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+
+    .fullWidthText {
+        width: 90%;
+    }
+
+    .ratingIcon {
+        max-height: 10%;
+
+        background-position: center center;
+        background-repeat: no-repeat;
+    }
+
+    #map {
+        height: 90vh;
+    }
+</style>
+<body>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+      integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+      crossorigin=""/>
+
+<!-- Make sure you put this AFTER Leaflet's CSS -->
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
+
+
+<div id="mainContainer">
+
+
+    <div id="map"></div>
+    <script>
+
+        var map = L.map('map').setView([50.261681, 19.024098], 9);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+
+    </script>
+</div>
+<div class="menu">
+    <img src="logo.png" class="logo">
+    <div class="rightContainer">Pokaż miejsca grupy:
+        <input type="text" id="groupName">
+        <input type="button" id="showForGroup" value="Pokaż" onclick="getAllPlacesForGroup()"><br><br>
+        <input type="button" id="showAll" value="Odśwież miejsca" onclick="getAllPlaces()">
+    </div>
+    <div id="bufor">
+    </div>
+</div>
+<script>
+    var arrayOfPlaces = [];
+    var arrayOfMarkers = [];
+    var arrayOfPlacesRatings = [];
+
+    function getAllPlaces() {
+        fetch('HTTP://localhost/api1.0/getAllPlaces', {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+
+
+                for (const product of data) {
+                    arrayOfMarkers[product.id] = L.marker([product.latitude, product.longitude]).addTo(map).bindPopup(product.description);
+                    arrayOfMarkers[product.id].on('click', event => {
+                        onMarkerClick(event, product.id);
+                    });
+                    arrayOfPlaces[product.id] = product;
+                }
+            })
+            .catch(console.error);
+    }
+
+    function getAllPlacesForGroup() {
+        fetch('HTTP://localhost/api1.0/getAllPlaces/' + document.getElementById('groupName').value, {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+
+
+                for (const product of data) {
+                    arrayOfMarkers[product.id] = L.marker([product.latitude, product.longitude]).addTo(map).bindPopup(product.description);
+                    arrayOfMarkers[product.id].on('click', event => {
+                        onMarkerClick(event, product.id);
+                    });
+                    arrayOfPlaces[product.id] = product;
+                }
+            })
+            .catch(console.error);
+    }
+
+    function onMapClick(e) {
+        var bufor = document.getElementById("bufor");
+        bufor.innerHTML = null;
+
+        let place = document.createElement('div');
+        place.setAttribute("class", `container`);
+
+        place.append("Nowe miejsce");
+        let lat = document.createElement('input');
+        lat.setAttribute("class", "fullWidthText");
+        lat.setAttribute("value", e.latlng.lat);
+        lat.setAttribute("type", "text");
+        lat.setAttribute("id", "newLat");
+        lat.setAttribute("disabled", "true");
+        place.append(lat);
+
+        let lon = document.createElement('input');
+        lon.setAttribute("class", "fullWidthText");
+        lon.setAttribute("value", e.latlng.lng);
+        lon.setAttribute("type", "text");
+        lon.setAttribute("id", "newLon");
+        lon.setAttribute("disabled", "true");
+        place.append(lon);
+
+        let description = document.createElement('input');
+        description.setAttribute("class", "fullWidthText");
+        description.setAttribute("placeholder", "Opisz swoje miejsce");
+        description.setAttribute("type", "text");
+        description.setAttribute("id", "newDescription");
+        place.append(description);
+
+        let firstImageUrl = document.createElement('input');
+        firstImageUrl.setAttribute("class", "fullWidthText");
+        firstImageUrl.setAttribute("placeholder", "Link do pierwszego zdjęcia");
+        firstImageUrl.setAttribute("type", "text");
+        firstImageUrl.setAttribute("id", "newFirstImageUrl");
+        place.append(firstImageUrl);
+
+        let secondImageUrl = document.createElement('input');
+        secondImageUrl.setAttribute("class", "fullWidthText");
+        secondImageUrl.setAttribute("placeholder", "Link do drugiego zdjęcia");
+        secondImageUrl.setAttribute("type", "text");
+        secondImageUrl.setAttribute("id", "newSecondImageUrl");
+        place.append(secondImageUrl);
+
+        let thirdImageUrl = document.createElement('input');
+        thirdImageUrl.setAttribute("class", "fullWidthText");
+        thirdImageUrl.setAttribute("placeholder", "Link do trzeciego zdjęcia");
+        thirdImageUrl.setAttribute("type", "text");
+        thirdImageUrl.setAttribute("id", "newThirdImageUrl");
+        place.append(thirdImageUrl);
+
+        let group = document.createElement('input');
+        group.setAttribute("class", "fullWidthText");
+        group.setAttribute("placeholder", "Dodaj nazwę grupy jeśli chcesz ukryć miejsce");
+        group.setAttribute("type", "text");
+        group.setAttribute("id", "newGroup");
+        place.append(group);
+
+        let send = document.createElement('input');
+        send.setAttribute("class", "fullWidthText");
+        send.setAttribute("type", "button");
+        send.setAttribute("id", "send");
+        send.setAttribute("value", "Dodaj");
+        send.setAttribute("onclick", "addNewPlace()");
+
+        place.append(send);
+
+        bufor.append(place);
+    }
+
+    function addNewPlace() {
+        var data = {
+            latitude: document.getElementById("newLat").value,
+            longitude: document.getElementById("newLon").value,
+            description: document.getElementById("newDescription").value,
+            firstImageUrl: document.getElementById("newFirstImageUrl").value,
+            secondImageUrl: document.getElementById("newSecondImageUrl").value,
+            thirdImageUrl: document.getElementById("newThirdImageUrl").value,
+            group: document.getElementById("newGroup").value,
+        };
+
+        fetch('http://localhost/api1.0/createNewPlace', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (response.status === 400) {
+                    alert("Błąd podczas dodawania miejsca!");
+                    return;
+                }
+
+                if (response.status === 422) {
+                    alert("Jedno z pól jest niepoprawne. Popraw i ponów próbę!");
+                    return;
+                }
+                if (response.status === 201) {
+                    alert("Dodano pomyslnie!");
+                    if (document.getElementById("newGroup").value != '') {
+                        document.getElementById('groupName').value = document.getElementById("newGroup").value;
+                        getAllPlacesForGroup();
+                    } else {
+                        getAllPlaces();
+                    }
+                }
+            })
+    }
+
+    function rate(id) {
+        var newBody = document.getElementById("newBody").value
+        var isOk = document.getElementById("isOk").checked;
+        if (isOk == true) {
+            var type = 1;
+        } else {
+            var type = 0;
+        }
+        var placeId = id;
+        var isComment;
+        if (newBody == "" || newBody == null) {
+            newBody = null;
+            isComment = false;
+        } else {
+            isComment = true;
+        }
+
+        var data = {
+            body: newBody,
+            type: type,
+            placeId: placeId,
+            ratingId: null,
+            isComment: isComment
+        };
+
+        fetch('http://localhost/api1.0/rate', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+            .then(response => {
+                if (response.status === 400) {
+                    alert("Błąd podczas oceniania!");
+                    return;
+                }
+
+                if (response.status === 422) {
+                    alert("Jedno z pól jest niepoprawne. Popraw i ponów próbę!");
+                    return;
+                }
+                if (response.status === 201) {
+                    alert("Oceniono pomyslnie!");
+                    onMarkerClick(null, id);
+                }
+            })
+    }
+
+    function onMarkerClick(e, id) {
+        var bufor = document.getElementById("bufor");
+        bufor.innerHTML = null;
+
+        let place = document.createElement('div');
+        place.setAttribute("class", `container`);
+        place.append(
+            `${
+                arrayOfPlaces[id].description
+            } `
+        );
+
+        if (arrayOfPlaces[id].firstImageUrl !== "") {
+            let firstImage = document.createElement('img');
+            firstImage.setAttribute("src", ` ${arrayOfPlaces[id].firstImageUrl} `);
+            firstImage.setAttribute("class", `imageSizeCSS`);
+
+            place.append(firstImage);
+        }
+
+        if (arrayOfPlaces[id].secondImageUrl !== "") {
+            let secondImage = document.createElement('img');
+            secondImage.setAttribute("src", ` ${arrayOfPlaces[id].secondImageUrl} `);
+            secondImage.setAttribute("class", `imageSizeCSS`);
+
+            place.append(secondImage);
+        }
+
+        if (arrayOfPlaces[id].thirdImageUrl !== "") {
+            let thirdImage = document.createElement('img');
+            thirdImage.setAttribute("src", ` ${arrayOfPlaces[id].thirdImageUrl} `);
+            thirdImage.setAttribute("class", `imageSizeCSS`);
+
+            place.append(thirdImage);
+        }
+
+        document.getElementById("bufor").appendChild(place);
+
+        fetch('HTTP://localhost/api1.0/getAllRatings?id=' + id + '&place=true', {
+            method: 'GET'
+        })
+            .then(response => response.json())
+            .then(data => {
+
+                var ratings = [];
+                for (const rating of data) {
+
+                    let comment = document.createElement('div');
+                    comment.setAttribute("class", `rating`);
+                    if (rating.isComment === true) {
+                        comment.append(
+                            `${
+                                rating.description
+                            }     `
+                        );
+                    } else {
+                        if (rating.type === "GOOD") {
+                            comment.append(
+                                `Ktoś ocenił to miejsce pozytywnie.    `
+                            );
+                        } else {
+                            comment.append(
+                                `Ktoś ocenił to miejsce negatywnie.    `
+                            );
+                        }
+                    }
+                    let ratingIcon = document.createElement('img');
+                    if (rating.type === "GOOD") {
+                        ratingIcon.setAttribute("src", `https://upload.wikimedia.org/wikipedia/commons/8/80/Symbol_OK.svg`);
+                    } else {
+                        ratingIcon.setAttribute("src", `https://upload.wikimedia.org/wikipedia/commons/c/c4/No_icon_red.svg`);
+                    }
+                    ratingIcon.setAttribute("class", `ratingIcon`);
+
+                    comment.append(ratingIcon);
+
+
+                    place.append(comment);
+                    comment.append(
+                        `
+                             Dodano ${
+                            rating.creationTime
+                        }     `
+                    );
+
+                }
+            })
+            .catch(console.error);
+
+        let body = document.createElement('input');
+        body.setAttribute("class", "fullWidthText");
+        body.setAttribute("placeholder", "Opisz swoje doświadczenie z tym miejscem");
+        body.setAttribute("type", "text");
+        body.setAttribute("id", "newBody");
+
+        let isOk = document.createElement('input');
+        isOk.setAttribute("class", "fullWidthText");
+        isOk.setAttribute("type", "checkbox");
+        isOk.setAttribute("id", "isOk");
+        isOk.setAttribute("name", "isOk");
+
+        let rate = document.createElement('input');
+        rate.setAttribute("class", "fullWidthText");
+        rate.setAttribute("type", "button");
+        rate.setAttribute("id", "rate");
+        rate.setAttribute("value", "Oceń");
+        rate.setAttribute("onclick", "rate(" + id + ")");
+
+        let comment = document.createElement('div');
+        comment.setAttribute("class", `rating`);
+        comment.append(body);
+        comment.append("Czy pozytywnie oceniasz to miejsce?");
+        comment.append(isOk);
+        comment.append(rate);
+
+        place.append(comment)
+    }
+
+    map.on('click', onMapClick);
+    getAllPlaces();
+</script>
+</body>
+

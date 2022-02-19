@@ -1,0 +1,11 @@
+parameters:
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    MeetingPlace\:
+        resource: '../../../src/'
+
+    GuzzleHttp\Client: ~

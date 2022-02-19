@@ -1,0 +1,26 @@
+createNewPlace:
+    path: /api1.0/createNewPlace
+    controller: MeetingPlace\Places\Controllers\CreateNewPlace::run
+    methods: POST
+
+getAllPlaces:
+    path: /api1.0/getAllPlaces
+    controller: MeetingPlace\Places\Controllers\GetAllPlaces::run
+    methods: GET
+
+getAllPlacesWithGroup:
+    path: /api1.0/getAllPlaces/{groupName}
+    controller: MeetingPlace\Places\Controllers\GetAllPlaces::run
+    methods: GET
+    requirements:
+        group: '\.*?'
+
+getAllRatings:
+    path: /api1.0/getAllRatings
+    controller: MeetingPlace\Ratings\Controllers\GetRatings::run
+    methods: GET
+
+rate:
+    path: /api1.0/rate
+    controller: MeetingPlace\Ratings\Controllers\RateSomething::run
+    methods: POST
