@@ -1,0 +1,137 @@
+{
+	"info": {
+		"_postman_id": "10e5869d-c52a-4f26-8658-ae839837228d",
+		"name": "MeetingPlace",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Dodaj miejsce",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"latitude\": \"50.380792\",\r\n    \"longitude\": \"19.013612\",\r\n    \"description\": \"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas id lacus fringilla, egestas mauris scelerisque, fermentum ante. Donec imperdiet, dolor id rhoncus interdum, leo dui faucibus nibh, nec ultrices ipsum lacus in lacus. Proin at ex lacus. Nulla vitae sodales eros, ut dictum diam. Aliquam ac molestie felis, et aliquam ligula\",\r\n    \"firstImageUrl\": \"https://www.prawo.pl/gfx/prawopl/_thumbs/pl/wkdokumenty/000/509/600/1/przyroda-00030_thinkstockphotos,oX6D62aapFTLo7bXW5mZ.jpg\",\r\n    \"secondImageUrl\": \"https://cdn.galleries.smcloud.net/t/galleries/gf-JFk3-QgZA-y9nY_las-664x442.jpg\",\r\n    \"thirdImageUrl\": \"https://swiatoze.pl/wp-content/uploads/2017/03/slonca-droga-las-drzewa-promienie.jpeg\",\r\n    \"group\": \"\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api1.0/createNewPlace",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api1.0",
+						"createNewPlace"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pobierz ocenę miejsca po ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/api1.0/getAllRatings?id=6&place=true",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api1.0",
+						"getAllRatings"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "6"
+						},
+						{
+							"key": "place",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pobierz ocenę komentarza po ID",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/api1.0/getAllRatings?id=1&place=false",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api1.0",
+						"getAllRatings"
+					],
+					"query": [
+						{
+							"key": "id",
+							"value": "1"
+						},
+						{
+							"key": "place",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Oceń",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"body\": \"dobre\",\r\n    \"type\": 0,\r\n    \"placeId\": 1,\r\n    \"ratingId\": null,\r\n    \"isComment\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "localhost/api1.0/rate",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api1.0",
+						"rate"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Pobierz wszystkie miejsca",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "localhost/api1.0/getAllPlaces",
+					"host": [
+						"localhost"
+					],
+					"path": [
+						"api1.0",
+						"getAllPlaces"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
